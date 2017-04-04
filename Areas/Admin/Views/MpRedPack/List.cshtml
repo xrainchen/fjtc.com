@@ -1,0 +1,74 @@
+﻿@model Fjtc.Model.SearchModel.MpWeiXinRedPackLogSearchParameter
+    @{
+        Layout = null;
+        var tableId = Guid.NewGuid().ToString().Replace("-", "");
+        var pagerId = Guid.NewGuid().ToString().Replace("-", "");
+        var formId = Guid.NewGuid().ToString().Replace("-", "");
+    }
+    <div class="pageHeader">
+        <form id="@formId" onsubmit="return navTabSearch(this);" action="@Url.Action("List")" method="post">
+            @Html.Partial("_Pager", Model)
+            <div class="searchBar">
+                <table class="searchContent">
+                    <tr>
+                        <td>
+                            昵称：@Html.TextBoxFor(m => m.Name)
+                        </td>
+                        <td>
+                            发送时间：
+                            <input id="mp_user_list_begintime" name="BeginSearchTime" class="Wdate" type="text" value="@Model.BeginSearchTime" onFocus="WdatePicker({ dateFmt:'yyyy-MM-dd HH:mm',maxDate: '#F{$dp.$D(\'mp_user_list_endtime\')}' })" />
+                            -<input id="mp_user_list_endtime" name="EndSearchTime" class="Wdate" type="text" value="@Model.EndSearchTime" onFocus="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm', minDate: '#F{$dp.$D(\'mp_user_list_begintime\')}' })" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="subBar">
+                <ul>
+                    <li><div class="buttonActive"><div class="buttonContent"><button type="button" onclick="Search()">查询</button></div></div></li>
+                </ul>
+            </div>
+        </form>
+    </div>
+    <div class="pageContent">
+        <div class="panelBar">
+            <ul class="toolBar">
+                <li><a class="add" href="@Url.Action("SendRedPack")"  target="dialog" width="800" height="480"><span>发送红包</span></a></li>
+            </ul>
+        </div>
+        <table id="@tableId"></table>
+        <div id="@pagerId"></div>
+    </div>
+    <script>
+        function InitGrid() {
+            $("#@tableId").jqGrid({
+                url: '@Url.Action("List")',
+                mtype: 'post',
+                datatype: "json",
+                colModel: [
+                    { label: 'Id', name: 'Id', width: '50px', align: 'center', sortable: false },
+                    { label: '用户', name: 'MpUserNick', width: '240px' },
+                    { label: '红包金额', name: 'RedPackAmount', align: 'center', width: '250px' },
+                    { label: '发送时间', name: 'CreatedTime', align: 'center', formatter: JsonDateStampFormat },
+                    { label: '备注', name: 'Remark', align: 'center' }
+                ],
+                rowNum: 10,
+                rowList: [10, 50, 100],
+                //autowidth: false,
+                width: '100%',
+                height: '375px',
+                prmNames: jqGridDefaultConfig.prmNames,
+                jsonReader: jqGridDefaultConfig.jsonReader,
+                postData: FormToJson({ formId: '@formId' }),
+                pager: '#@pagerId',
+                viewrecords: true,
+                caption: "红包记录"
+            }).navGrid("#@tableId", { edit: false, add: false, del: false });
+        }
+
+        function Search() {
+            $("#@tableId").jqGrid('setGridParam', { page: 1, postData: FormToJson({ formId: '@formId' }) }).trigger("reloadGrid");
+        }
+        $(function () {
+            InitGrid();
+        });
+    </script>

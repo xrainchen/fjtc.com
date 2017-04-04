@@ -1,0 +1,27 @@
+﻿@model Fjtc.Model.Entity.ProductUser
+@{
+    Layout = null;
+}
+<div class="pageContent">
+    <form method="post" action="@Url.Action("Save", new { area = "Admin" })" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
+        <div class="pageFormContent" layoutH="180">
+            <p>
+                <label>昵称：</label>
+                @Html.TextBoxFor(m => m.Name)
+            </p>
+            <p>
+                <label>绑定域名：</label>
+                @Html.TextBoxFor(m => m.BindHost, new {@readonly = true})
+            </p>
+            <p>
+                <label>网站名称：</label>
+                @Html.TextBoxFor(m => m.SiteName)
+            </p>
+        </div>
+        <div class="formBar">
+            <ul>
+                <li><div class="buttonActive"><div class="buttonContent"><button type="submit">保存</button></div></div></li>
+            </ul>
+        </div>
+    </form>
+</div>

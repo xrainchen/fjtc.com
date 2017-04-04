@@ -1,0 +1,44 @@
+﻿@{
+    Layout = null;
+}
+@model fjtc.com.Areas.Admin.Models.RedPackModel
+<div class="pageContent">
+    <form method="post" action="@Url.Action("SendRedPack", new { area = "Admin" })" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
+        <div class="pageFormContent nowrap" layoutH="60">
+            @Html.AntiForgeryToken()
+            <dl>
+                <dt>红包金额：</dt>
+                <dd>
+                    @Html.TextBoxFor(m => m.RedPackTotalAmount,new {@class= "number" })元
+                    <span class="info"></span>
+                </dd>
+            </dl>
+            <dl>
+                <dt>发放方式：</dt>
+                <dd>
+                    <input type="radio" name="SendRedPackType" value="1" checked="checked" />平均
+                    <input type="radio" name="SendRedPackType" value="2" />随机
+                </dd>
+            </dl>
+            <dl>
+                <dt>选择发送用户：</dt>
+                <dd>
+                    @Html.HiddenFor(m => m.MpUserIds)
+                    <input id="MpUserNicks" class="required textInput readonly" name="MpUserNicks" type="text" readonly="">
+                    <a class="btnLook" target="dialog" mask="true" rel="SelectMpUser" href="javascript:;" onclick="$(this).attr('href','@Url.Action("SelectMpUser","MpUser")?SelectedIds='+$('#MpUserIds').val())">选择用户</a>
+                </dd>
+            </dl>
+        </div>
+        <div class="formBar">
+            <ul>
+                <li><div class="buttonActive"><div class="buttonContent"><button type="submit">确认发送</button></div></div></li>
+            </ul>
+        </div>
+    </form>
+</div>
+<script>
+    window.SelectUserCallback = function (selectIds, selectNames) {
+        $("#MpUserIds").val(selectIds);
+        $("#MpUserNicks").val(selectNames);
+    }
+</script>

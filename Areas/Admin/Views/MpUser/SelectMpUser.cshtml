@@ -1,0 +1,65 @@
+﻿@using Fjtc.Model.Entity
+@model Fjtc.Model.SearchModel.MpWeiXinUserSerachParameter
+@{
+    Layout = null;
+    var returnList = Model.ReturnList as IList<MpWeiXinUser>;
+}
+<div class="pageContent">
+    <table id="userSelectedDataSource" style="display: none;">
+        @if (returnList != null && returnList.Any())
+        {
+            foreach (var item in returnList)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.NickName</td>
+                </tr>
+            }
+        }
+    </table>
+    <div class="dbMultitableTool">
+        <ul class="buttonlist">
+            <li>
+                <div class="buttonActive">
+                    <div class="buttonContent"><button type="button" onclick="window.parent.SelectUserCallback($('#userSelectedDataBind').GetSelectFields(function (x) { return x.Id; }).join(','),$('#userSelectedDataBind').GetSelectFields(function (x) { return x.NickName; }).join(',')); $.pdialog.closeCurrent();">确认</button>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="buttonActive">
+                    <div class="buttonContent">
+                        <button type="button" onclick="$('#userSelectedDataBind').TrItemCheckAll()">全选</button>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="buttonActive">
+                    <div class="buttonContent">
+                        <button type="button" onclick="$('#userSelectedDataBind').TrItemInvertCheck()">反选</button>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="buttonActive">
+                    <div class="buttonContent" onclick="$('#userSelectedDataBind').ClearAll()">
+                        <button type="button">清空</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div id="userSelectedDataBind">
+    </div>
+    <script>
+        $("#userSelectedDataBind").doubleMultiple({
+            name: '用户',
+            searchFieldName: 'NickName',
+            colModel: [
+                { name: 'Id', field: 'Id', hidden: true },
+                { name: '昵称', field: 'NickName' }
+            ],
+            sourceDataId: 'userSelectedDataSource',
+            sltDataIds: { value: '@Model.SelectedIds', field: 'Id' }
+        }).InitSerach();
+    </script>
+</div>

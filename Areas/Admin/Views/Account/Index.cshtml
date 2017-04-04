@@ -1,0 +1,55 @@
+﻿@model fjtc.com.Models.LoginModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>17Team内容管理系统</title>
+    <link href="@Url.Content("~/Content/login.css")" rel="stylesheet" />
+    <script src="@Url.Content("~/Scripts/jquery-2.1.4.min.js")" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript">
+        function checkform() {
+            if ($("#UserName").val() == "") {
+                alert("请输入账号");
+                $("#UserName").focus();
+                return false;
+            }
+            if ($("#Password").val() == "") {
+                alert("请输入密码");
+                $("#Password").focus();
+                return false;
+            }
+            if ($("#VerifyCode").val() == "") {
+                alert("请输入验证码");
+                $("#VerifyCode").focus();
+                return false;
+            }
+            return true;
+        }
+        window.onload = function () {
+            $("#UserName").focus();
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="@Url.Action("Index","Account",new {area="Admin"})" id="frmxx">
+        @Html.AntiForgeryToken()
+        <div id="login">
+            <h1>登录后台</h1>
+            @Html.TextBoxFor(m => m.UserName, new { placeholder = "用户名", required = "required" })
+            @Html.PasswordFor(m => m.Password, new { placeholder = "密码", required = "required" })
+            <div>
+                @Html.TextBoxFor(m => m.VerifyCode, new { placeholder = "验证码", required = "required", style = "width:150px;" })
+                <img style="float: right; cursor: hand; width: 100px; height: 40px;cursor:pointer" src="@Url.Action("VerifyCode","Account",new {area="Admin"})" alt="看不清？点击更换" valign="top" onclick="this.src=this.src+'?'" />
+            </div>
+            <div style="width:100%">
+                @Html.ValidationMessage("UserName")
+                @Html.ValidationMessage("Password")
+                @Html.ValidationMessage("VerifyCode")
+            </div>
+            <input class="but" type="submit" onclick="return checkform()" value="登录" />
+        </div>
+    </form>
+</body>
+</html>

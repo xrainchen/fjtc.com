@@ -1,0 +1,109 @@
+﻿@model Fjtc.Model.SearchModel.MpWeiXinUserSerachParameter
+@{
+    Layout = null;
+    var tableId = Guid.NewGuid().ToString().Replace("-", "");
+    var pagerId = Guid.NewGuid().ToString().Replace("-", "");
+    var formId = Guid.NewGuid().ToString().Replace("-", "");
+}
+<div class="pageHeader">
+    <form id="@formId" onsubmit="return navTabSearch(this);" action="@Url.Action("List")" method="post">
+        @Html.Partial("_Pager", Model)
+        <div class="searchBar">
+            <table class="searchContent">
+                <tr>
+                    <td>
+                        昵称：@Html.TextBoxFor(m => m.Name)
+                    </td>
+                    <td>
+                        关注时间：
+                        <input id="mp_user_list_begintime" name="BeginSearchTime" class="Wdate" type="text" value="@Model.BeginSearchTime" onFocus="WdatePicker({ dateFmt:'yyyy-MM-dd HH:mm',maxDate: '#F{$dp.$D(\'mp_user_list_endtime\')}' })"/>
+                        -<input id="mp_user_list_endtime" name="EndSearchTime" class="Wdate" type="text" value="@Model.EndSearchTime" onFocus="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm', minDate: '#F{$dp.$D(\'mp_user_list_begintime\')}' })"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="subBar">
+            <ul>
+                <li><div class="buttonActive"><div class="buttonContent"><button type="button" onclick="Search()">查询</button></div></div></li>
+            </ul>
+        </div>
+    </form>
+</div>
+<div class="pageContent">
+    <div class="panelBar">
+        <ul class="toolBar">
+            <li><a class="add" href="@Url.Action("SyncUserInfoData")" target="ajaxTodo"><span>同步粉丝</span></a></li>
+        </ul>
+    </div>
+    <table id="@tableId"></table>
+    <div id="@pagerId"></div>
+</div>
+<script>
+    function InitGrid() {
+        $("#@tableId").jqGrid({
+            url: '@Url.Action("List")',
+            mtype: 'post',
+            datatype: "json",
+            colModel: [
+                { label: 'Id', name: 'Id', width: '50px', align: 'center', sortable: false },
+                {
+                    label: '用户', name: 'User', width: '240px',
+                    formatter: function (cellvalue, options, rawObject) {
+                        return "<div style='display:bolck;width:210px;height:60px;'>"
+                            + "<div style='margin: 5px 10px 0 0;width:60px;height:100%;float:left;'><img style='width:60px;height:60px;' src='" + rawObject.HeadImgUrl + "' /></div>"
+                            + "<div style='margin: 5px 10px 0 0;width:120px;height:100%;float:left;'>"
+                            + "<p style='margin-top:5px;height:20px;line-height:20px;'><b>" + rawObject.NickName + "</b></p>"
+                            + "<p style='margin-top:5px;height:20px;line-height:20px;'>" + rawObject.Country + " " + rawObject.Province + " " + rawObject.City + "</p>"
+                            + "</div>"
+                            + "</div>";
+                    }
+                },
+                { label: '微信号', name: 'OpenId', align: 'center', width: '250px' },
+                {
+                    label: '关注', name: 'Subscribe', align: 'center', width: '50px',
+                    formatter: function (cellvalue, options, rawObject) {
+                        switch (cellvalue) {
+                            case 1:
+                                return "是";
+                            default:
+                                return "否";
+                        }
+                    }
+                },
+                {
+                    label: '性别', name: 'Sex', align: 'center', width: '50px',
+                    formatter: function (cellvalue, options, rawObject) {
+                        switch (cellvalue) {
+                            case 1:
+                                return "男";
+                            case 2:
+                                return "女";
+                            default:
+                                return "未知";
+                        }
+                    }
+                },
+                { label: '关注时间', name: 'SubscribeTime', align: 'center', formatter: JsonDateStampFormat },
+                { label: '备注', name: 'Remark', align: 'center' }
+            ],
+            rowNum: 10,
+            rowList: [10, 50, 100],
+            //autowidth: false,
+            width: '100%',
+            height: '375px',
+            prmNames: jqGridDefaultConfig.prmNames,
+            jsonReader: jqGridDefaultConfig.jsonReader,
+            postData: FormToJson({ formId: '@formId' }),
+            pager: '#@pagerId',
+            viewrecords: true,
+            caption: "粉丝列表"
+        }).navGrid("#@tableId", { edit: false, add: false, del: false });
+    }
+
+    function Search() {
+        $("#@tableId").jqGrid('setGridParam', { page: 1, postData: FormToJson({ formId: '@formId' }) }).trigger("reloadGrid");
+    }
+    $(function () {
+        InitGrid();
+    });
+</script>

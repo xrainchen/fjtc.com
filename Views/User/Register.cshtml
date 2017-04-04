@@ -1,0 +1,88 @@
+﻿@model Fjtc.Model.ViewModel.UserViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>用户注册</title>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.4.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.extend.js")"></script>
+    <script>
+        $(function () {
+            $("#registerform").validate({
+                //debug: true,
+                rules: {
+                    LoginName: {
+                        required: true,
+                        rangelength: [6, 16]
+                    },
+                    Name: {
+                        stringCheck:true
+                    },
+                    Password: {
+                        required: true,
+                        rangelength: [6, 16]
+                    },
+                    MobilePhone: {
+                        isMobile:true
+                    }
+                },
+                messages: {
+                    LoginName: {
+                        required: "请输入用户名",
+                        rangelength: "请输入6-16位字母开头的字母或数字和下划线"
+                    },
+                    Password: {
+                        required: "请输入密码",
+                        rangelength: "请输入6-16位字母开头的字母或数字和下划线"
+                    }
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+    <div>
+        <form id="registerform" method="POST" action="@Url.Action("Register")">
+            @Html.AntiForgeryToken()
+            <p>
+                <label>
+                    用户名：
+                    @Html.TextBoxFor(m => m.LoginName)
+                </label>
+            </p>
+            <p>
+                <label>
+                    昵称：
+                    @Html.TextBoxFor(m => m.Name)
+                </label>
+            </p>
+            <p>
+                <label>
+                    密 码：
+                    @Html.PasswordFor(m => m.Password)
+                </label>
+            </p>
+            <p>
+                <label>
+                    手机号：
+                    @Html.TextBoxFor(m => m.MobilePhone)
+                </label>
+            </p>
+            <p>
+                <label>
+                    验证码：
+                    <input type="text" name="CheckCode" />
+                    <img src="@Url.Action("VerifyCode")" onclick="this.src = this.src + '?'" />
+                </label>
+            </p>
+            <p>
+                <input type="submit" value="注册" />
+            </p>
+        </form>
+    </div>
+</body>
+</html>

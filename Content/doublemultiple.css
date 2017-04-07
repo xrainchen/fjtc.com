@@ -1,37 +1,30 @@
-﻿.custom-header {
-    width: 95%;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    background-color: #c6d0e6;
+﻿.dbmultitable {
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    table-layout: fixed;
+    width: 90%;
+    background-color: #FFF;
 }
-
-.dbmultitable {
-    width: 95%;
-    border: 1px solid #c6d0e6;
-    margin-top: 10px;
-}
-
-    .dbmultitable tr {
-        border-top: 1px solid #c6d0e6;
-        border-left: 1px solid #c6d0e6;
-    }
 
     .dbmultitable th {
         text-align: center;
-        font-size: 25px;
-        height: 30px;
-        border-bottom: 1px solid #c6d0e6;
-        border-right: 1px solid #c6d0e6;
+        font-weight: bold;
+        background-color:#f0eff0;
     }
 
-    .dbmultitable td {
-        text-align: center;
-        font-size: 15px;
-        height: 20px;
-        border-bottom: 1px solid #c6d0e6;
-        border-right: 1px solid #c6d0e6;
+    .dbmultitable td, .dbmultitable th {
+        border: 1px solid #cad9ea;
+        padding: 10px 5px 10px;
+        word-wrap: break-word;
     }
+
+    .dbmultitable tr.alter {
+        background-color: #f5fafe;
+    }
+.trItem:hover {
+    background-color: #ededed;
+}
+
 
 .dbMultitableTool {
     width: 100%;

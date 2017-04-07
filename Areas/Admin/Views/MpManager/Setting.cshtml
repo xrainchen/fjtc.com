@@ -25,13 +25,17 @@
                 @Html.TextBoxFor(m => m.MachId)
             </p>
             <p>
-                <label>API密钥	：</label>
+                <label>API密钥 ：</label>
                 @Html.TextBoxFor(m => m.ApiKey)
+            </p>
+            <p>
+                <label>证书路径	：</label>
+                @Html.TextBoxFor(m => m.CertPath)
             </p>
         </div>
         <div>
             <p style="font-size: 20px;">
-                授权地址:@("http:" + currentUser.BindHost + Url.Action("Auth", "MpWeiXin", new { area = "" }))
+                授权地址:@("http://" + currentUser.BindHost + Url.Action("Auth", "MpWeiXin", new { area = "" }))
             </p>
         </div>
         <div class="formBar">

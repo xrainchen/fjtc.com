@@ -1,15 +1,24 @@
 ﻿@{
     Layout = null;
 }
+@using cms.rponey.cc.Utilty.Extend
+@using fjtc.com.Areas.Admin.Models
 @model fjtc.com.Areas.Admin.Models.RedPackModel
 <div class="pageContent">
     <form method="post" action="@Url.Action("SendRedPack", new { area = "Admin" })" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
         <div class="pageFormContent nowrap" layoutH="60">
             @Html.AntiForgeryToken()
             <dl>
+                <dt>活动名称：</dt>
+                <dd>
+                    @Html.TextBoxFor(m => m.ActionName, new { @class = "required" })
+                    <span class="info"></span>
+                </dd>
+            </dl>
+            <dl>
                 <dt>红包金额：</dt>
                 <dd>
-                    @Html.TextBoxFor(m => m.RedPackTotalAmount,new {@class= "number" })元
+                    @Html.TextBoxFor(m => m.RedPackTotalAmount, new { @class = "number" })元
                     <span class="info"></span>
                 </dd>
             </dl>
@@ -21,11 +30,36 @@
                 </dd>
             </dl>
             <dl>
+                <dt>场景：</dt>
+                <dd>
+                    <select name="SceneIdType">
+                        @foreach (var scene in EnumExtend.GetEnumRemarks<SceneIdTypeEnum>())
+                        {
+                            <option value="@scene.Key">@scene.Value</option>
+                        }
+                    </select>
+                </dd>
+            </dl>
+            <dl>
+                <dt>祝福语：</dt>
+                <dd>
+                    @Html.TextBoxFor(m => m.Wishing, new { @class = "required" })
+                    <span class="info"></span>
+                </dd>
+            </dl>
+            <dl>
                 <dt>选择发送用户：</dt>
                 <dd>
                     @Html.HiddenFor(m => m.MpUserIds)
                     <input id="MpUserNicks" class="required textInput readonly" name="MpUserNicks" type="text" readonly="">
-                    <a class="btnLook" target="dialog" mask="true" rel="SelectMpUser" href="javascript:;" onclick="$(this).attr('href','@Url.Action("SelectMpUser","MpUser")?SelectedIds='+$('#MpUserIds').val())">选择用户</a>
+                    <a class="btnLook" target="dialog" mask="true" rel="SelectMpUser" href="javascript:;" onclick="$(this).attr('href', '@Url.Action("SelectMpUser", "MpUser")?SelectedIds=' + $('#MpUserIds').val())">选择用户</a>
+                </dd>
+            </dl>
+            <dl>
+                <dt>备注信息：</dt>
+                <dd>
+                    @Html.TextAreaFor(m => m.Remark, new { @class = "required" })
+                    <span class="info"></span>
                 </dd>
             </dl>
         </div>

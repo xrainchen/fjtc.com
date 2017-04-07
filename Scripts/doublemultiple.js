@@ -60,17 +60,21 @@
                 searchFieldName: '',//搜索字段 以,进行多字段分割  支持多个字段匹配搜索
                 colModel: [],
                 container: $('<div/>', { 'attribute-control-type': "container", 'style': 'width:100%' }),
-                selectableContainer: $('<div/>', { 'attribute-control-type': 'search', 'style': 'width:47%;float:left;' }),
-                selectionContainer: $('<div/>', { 'attribute-control-type': 'result', 'style': 'width:47%;float:right;' }),
+                selectableContainer: $('<div/>', { 'attribute-control-type': 'search', 'style': 'width:47%;float:left;border:1px solid #bee9f0;' }),
+                selectionContainer: $('<div/>', { 'attribute-control-type': 'result', 'style': 'width:47%;float:right;border:1px solid #bee9f0;' }),
                 sourceDataId: '', //数据源
-                sltDataIds: {value:'',field:''},//选中数据源
-                incrementName: 'doublemultipleIncrementId'
+                sltDataIds: { value: '', field: '' },//选中数据源
+                incrementName: 'doublemultipleIncrementId',
+                tbodySearch: { "attribute-control-type": "tbody", "attribute-control-name": "search-tbody" },//body搜索
+                tbodyResult: { "attribute-control-type": "tbody", "attribute-control-name": "result-tbody" },//body 结果
+                height: "300px"
             },
             $.doublemultiple.defaults, pin || {});
             p.incrementName = $.doublemultiple.getGuid();
             var ts = this,//ts this的临时变量
                 doublemultiple = {
-                    dbMultiData: [],//原始数据
+                    dbMultiData: [],//原始数据，根据多个搜索条件组合查询变化
+                    midDbMultiData: [],//中间原始数据保存变量
                     searchData: [],//搜索到数据
                     selectData: [],//选中数据
                     parm: p,//参数
@@ -81,12 +85,11 @@
                             var source = $t.dbMultiData;
                             //数据源中包含该对象
                             if (searchText !== "") {
-                                searchText = searchText.toLowerCase();
                                 source = Enumerable.From(source).Where(function (x) {
                                     var fields = searchField.split(',');
                                     var result = false;
                                     for (var i = 0; i < fields.length; i++) {
-                                        result = x[fields[i]].toLowerCase().indexOf(searchText) > -1;
+                                        result = x[fields[i]].toLowerCase().indexOf(searchText.toLowerCase()) > -1;
                                         if (result === true) {
                                             break;
                                         }
@@ -111,14 +114,13 @@
                         if (searchText === "") {
                             searchResultData = $t.selectData;
                         } else {
-                            searchText = searchText.toLowerCase();
                             if ($t.selectData.length > 0) {
                                 searchResultData = Enumerable.From($t.selectData)
                                     .Where(function (x) {
                                         var fields = searchField.split(',');
                                         var result = false;
                                         for (var i = 0; i < fields.length; i++) {
-                                            result = x[fields[i]].toLowerCase().indexOf(searchText) > -1;
+                                            result = x[fields[i]].toLowerCase().indexOf(searchText.toLowerCase()) > -1;
                                             if (result === true) {
                                                 break;
                                             }
@@ -171,6 +173,37 @@
                             }
                         }
                     },//移除选中数据
+                    SetSelectIds: function (sltIds) {
+                        var $t = this;
+                        var ids = sltIds.split(',');
+                        var sltData = (Enumerable.From($t.dbMultiData).Where(function (x) { return Enumerable.From(ids).Any(function (id) { return id === x[p.sltDataIds.field] }) }).ToArray() || []);
+                        for (var i = 0; i < sltData.length; i++) {
+                            var current = sltData[i];
+                            var isSlt = Enumerable.From($t.selectData).Where(function (x) { return x[p.incrementName] === current[p.incrementName] }).FirstOrDefault() || null;
+                            if (isSlt === null) {//未选择过，添加进去
+                                $t.selectData.push(sltData[i]);
+                            }
+                        }
+
+                    },//在结果中批量添加选中Id的数据
+                    ReloadData: function () {
+                        this.dbMultiData = this.midDbMultiData;
+                    },//重新加载搜索数据  还原搜索数据集
+                    ChangeMultiDataWithWhere: function (searchText, searchField) {
+                        this.dbMultiData = this.Search(searchText, searchField);
+                    },
+                    InvertCheck: function () {
+                        var $this = this;
+                        var invertData = [];
+                        if ($this.selectData.length < 1) {
+                            invertData = $this.midDbMultiData;
+                        } else {
+                            invertData = Enumerable.From($this.midDbMultiData).Where(function (i) {
+                                return Enumerable.From($this.selectData).All(function (sltDataItem) { return sltDataItem[p.incrementName] !== i[p.incrementName] });
+                            }).Select(function (x) { return x }).ToArray();;
+                        }
+                        $this.selectData = invertData;
+                    },//反选  改变选中结果值
                     InitMulti: function (tsObj) {
                         //初始化下拉框
                         var theadText = '<thead><tr>';
@@ -186,22 +219,22 @@
                             theadText += '<th ' + tdstyle + '>' + p.colModel[col].name + '</th>';
                         }
                         theadText += '</tr></thead>';
-                        
-                        var sourceTable = $("<div/>", { 'style': 'overflow-y: auto; height: 243px;' })
-                            .append($('<table/>', { 'class': 'dbmultitable' }).append(theadText).append($("<tbody/>", { "attribute-control-type": "tbody", "attribute-control-name": "search-tbody" })));//搜索 
 
-                        var sltTable = $("<div/>", { 'style': 'overflow-y: auto; height: 243px;' })
-                            .append($('<table/>', { 'class': 'dbmultitable' }).append(theadText).append($("<tbody/>", { "attribute-control-type": "tbody", "attribute-control-name": "result-tbody" })));//结果
-                        tsObj.append(
+                        var sourceTable = $("<div/>", { 'style': 'overflow-y: auto; height:' + p.height + ';' })
+                            .append($('<table/>', { 'class': 'dbmultitable', 'style': 'margin-left:5px;' }).append(theadText).append($("<tbody/>", p.tbodySearch)));//搜索 
+
+                        var sltTable = $("<div/>", { 'style': 'overflow-y: auto; height: ' + p.height + ';' })
+                            .append($('<table/>', { 'class': 'dbmultitable', 'style': 'margin-left:5px;' }).append(theadText).append($("<tbody/>", p.tbodyResult)));//结果
+                        $(tsObj).append(
                             p.container
-                            .append(p.selectableContainer.append("<div class='custom-header' style='margin-bottom: 8px;'>可选" + p.name + "</div><div>搜索：<input type='text' attribute-control-type='search' attribute-control-name='source' autocomplete='off' placeholder=''></div>").append(sourceTable))//左侧
-                            .append(p.selectionContainer.append("<div class='custom-header' style='margin-bottom: 8px;'>已选" + p.name + "</div><div>搜索：<input type='text' attribute-control-type='search'  attribute-control-name='result' autocomplete='off' placeholder=''></div>").append(sltTable))//右侧
+                            .append(p.selectableContainer.append("<div class='custom-header' style='text-align:center;font-weight:bold;background-color:#ededed;height:20px;line-height:20px;'>可选" + p.name + "</div><div style='margin:10px 5px 10px;'>搜索：<input type='text' attribute-control-type='search' attribute-control-name='source' autocomplete='off' placeholder=''></div>").append(sourceTable))//左侧
+                            .append(p.selectionContainer.append("<div class='custom-header' style='text-align:center;font-weight:bold;background-color:#ededed;height:20px;line-height:20px;'>已选" + p.name + "</div><div style='margin:10px 5px 10px;'>搜索：<input type='text' attribute-control-type='search'  attribute-control-name='result' autocomplete='off' placeholder=''></div>").append(sltTable))//右侧
                             [0]);
                     }//初始化下拉框
                 };
 
             /*----------------start-初始化数据源---------*/
-
+            doublemultiple.ReloadData();
             var data = [];
             if (p.colModel.length < 1) {
                 throw new error("colModel is null");
@@ -216,6 +249,7 @@
                 data.push(row);
             });
             doublemultiple.dbMultiData = data;
+            doublemultiple.midDbMultiData = data;
             /*----------------end-初始化数据源---------*/
 
             /*---------------start 初始化选中数据-------*/
@@ -302,27 +336,35 @@
                     indexTr.before($row);
                 }
             }
+            //this.InitSerach();//刷新搜索下拉框
         },//行点击事件
         SetList: function (result, body) {
             var $t = this[0];
+            var $this = this;
             body.find("tr").remove();
-            $(result).each(function (i, o) {
-                var tr = "<tr class='trItem' data-value='" + o[$t.doublemultiple.parm.incrementName] + "'>";
-                var colModel = $t.doublemultiple.parm.colModel;
-                for (var col = 0; col < colModel.length; col++) {
-                    //有hidden字段配置，则hidden=false时处理
-                    if (colModel[col].hidden) {
-                        if (colModel[col].hidden === false) {
-                            tr += "<td>" + o[colModel[col].field] + "</td>";
-                        }
-                    } else {//无hidden配置，说明可见
-                        tr += "<td>" + o[colModel[col].field] + "</td>";
-                    }
-                }
-                tr += "</tr>";
-                $(body).append(tr);
-            });
+            if (result.length > 0) {
+                $(result).each(function (i, o) {
+                    $(body).append($this.GetAddRowText(o));
+                });
+            }
         },//设置指定body下的下拉框
+        GetAddRowText: function (row) {
+            var $t = this[0];
+            var tr = "<tr class='trItem' data-value='" + row[$t.doublemultiple.parm.incrementName] + "'>";
+            var colModel = $t.doublemultiple.parm.colModel;
+            for (var col = 0; col < colModel.length; col++) {
+                //有hidden字段配置，则hidden=false时处理
+                if (colModel[col].hidden) {
+                    if (colModel[col].hidden === false) {
+                        tr += "<td>" + row[colModel[col].field] + "</td>";
+                    }
+                } else {//无hidden配置，说明可见
+                    tr += "<td>" + row[colModel[col].field] + "</td>";
+                }
+            }
+            tr += "</tr>";
+            return tr;
+        },//获取添加行
         SetSourceList: function (result) {
             this.SetList(result, this.find("tbody[attribute-control-name='search-tbody']").eq(0));
         },//初始化数据源下拉框
@@ -336,14 +378,16 @@
             });
         },//全选
         TrItemInvertCheck: function () {
-            var $this = this;//当前控件对象
-            var sourceLeft = $("tbody[attribute-control-name='search-tbody']").find("tr");
-            $($("tbody[attribute-control-name='result-tbody']").find("tr")).each(function (i, o) {
-                $this.RowClick(this);
-            });
-            $(sourceLeft).each(function (i, o) {
-                $this.RowClick(this);
-            });
+            //var $this = this;//当前控件对象
+            //var sourceLeft = $("tbody[attribute-control-name='search-tbody']").find("tr");
+            //$($("tbody[attribute-control-name='result-tbody']").find("tr")).each(function (i, o) {
+            //    $this.RowClick(this);
+            //});
+            //$(sourceLeft).each(function (i, o) {
+            //    $this.RowClick(this);
+            //});
+            this[0].doublemultiple.InvertCheck();
+            this.InitSerach();
         },//反选  左右结果对调
         ClearAll: function () {
             this.ClearAllSltData();
@@ -359,6 +403,32 @@
                 $this.SetSourceList($this.Search($(element).val(), searchField));
             }
         },//初始化搜索数据
+        SetSelectIds: function (sltIds) {
+            this[0].doublemultiple.SetSelectIds(sltIds);
+            this.InitSerach();
+        },//设置多个Id选中
+        ComplexConditionSerach: function (conditions) {
+            this[0].doublemultiple.ReloadData();
+            var $this = this[0];
+            $(conditions).each(function (i, o) {
+                var isSearch = false;
+                if (o.searchtext === '') {
+                    isSearch = false;
+                } else {
+                    if (o.defaultvalue) { //如果有默认值
+                        if (o.defaultValue !== o.searchtext) {
+                            isSearch = true;
+                        }
+                    } else {
+                        isSearch = true;
+                    }
+                }
+                if (isSearch) {
+                    $this.doublemultiple.ChangeMultiDataWithWhere(o.searchtext, o.searchfield);
+                }
+            });
+            this.InitSerach();
+        },//复合条件查询{searchtext:'',searchfield:'',defaultvalue:''}
         InitSerach: function () {
             var $this = this; var $t = this[0];
             $("input[attribute-control-type='search']").each(function (i, o) {

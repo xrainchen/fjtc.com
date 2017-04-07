@@ -11,11 +11,15 @@
             </p>
             <p>
                 <label>绑定域名：</label>
-                @Html.TextBoxFor(m => m.BindHost, new {@readonly = true})
+                @Html.TextBoxFor(m => m.BindHost, new { @readonly = true })
             </p>
             <p>
                 <label>网站名称：</label>
                 @Html.TextBoxFor(m => m.SiteName)
+            </p>
+            <p>
+                <label>公司名称：</label>
+                @Html.TextBoxFor(m => m.Company)
             </p>
         </div>
         <div class="formBar">

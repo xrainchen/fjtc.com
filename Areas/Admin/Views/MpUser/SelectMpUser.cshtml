@@ -13,6 +13,7 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.NickName</td>
+                    <td>@item.Remark</td>
                 </tr>
             }
         }
@@ -53,10 +54,11 @@
     <script>
         $("#userSelectedDataBind").doubleMultiple({
             name: '用户',
-            searchFieldName: 'NickName',
+            searchFieldName: 'NickName,Remark',
             colModel: [
                 { name: 'Id', field: 'Id', hidden: true },
-                { name: '昵称', field: 'NickName' }
+                { name: '昵称', field: 'NickName' },
+                { name: '备注', field: 'Remark' }
             ],
             sourceDataId: 'userSelectedDataSource',
             sltDataIds: { value: '@Model.SelectedIds', field: 'Id' }

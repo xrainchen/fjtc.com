@@ -33,6 +33,11 @@
     <div class="panelBar">
         <ul class="toolBar">
             <li><a class="add" href="@Url.Action("SyncUserInfoData")" target="ajaxTodo"><span>同步粉丝</span></a></li>
+            <li><a class="add" href="@Url.Action("SyncNewUserInfoData")" target="ajaxTodo"><span>同步新粉丝</span></a></li>
+            <li>
+                <a id="setRemarkLink" style="display: none;" href="javascript:;" target="dialog" rel="edit" title="设置备注" mask="true"></a>
+                <a class="edit" href="javascript:;" onclick="SetRemark()"><span>设置备注</span></a>
+            </li>
         </ul>
     </div>
     <table id="@tableId"></table>
@@ -86,11 +91,11 @@
                 { label: '关注时间', name: 'SubscribeTime', align: 'center', formatter: JsonDateStampFormat },
                 { label: '备注', name: 'Remark', align: 'center' }
             ],
-            rowNum: 10,
-            rowList: [10, 50, 100],
+            rowNum: 20,
+            rowList: [20, 50, 100],
             //autowidth: false,
             width: '100%',
-            height: '375px',
+            height: '500px',
             prmNames: jqGridDefaultConfig.prmNames,
             jsonReader: jqGridDefaultConfig.jsonReader,
             postData: FormToJson({ formId: '@formId' }),
@@ -102,6 +107,15 @@
 
     function Search() {
         $("#@tableId").jqGrid('setGridParam', { page: 1, postData: FormToJson({ formId: '@formId' }) }).trigger("reloadGrid");
+    }
+
+    function SetRemark() {
+        var row = $("#@tableId").jqGrid("getRowData", $("#@tableId").jqGrid('getGridParam', 'selrow'));
+        if (row.Id === undefined || row.Id === "undefined") {
+            alertMsg.warn("请选择用户");
+        } else {
+            $("#setRemarkLink").attr("href", "@Url.Action("RemarkUser")?navtab=edit&Id=" + row.Id).trigger("click");
+        }
     }
     $(function () {
         InitGrid();

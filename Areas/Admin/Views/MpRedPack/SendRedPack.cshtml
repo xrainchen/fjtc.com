@@ -25,8 +25,15 @@
             <dl>
                 <dt>发放方式：</dt>
                 <dd>
-                    <input type="radio" name="SendRedPackType" value="1" checked="checked" />平均
-                    <input type="radio" name="SendRedPackType" value="2" />随机
+                    <input type="radio" name="SendRedPackType" value="1" checked="checked"/>平均
+                    <input type="radio" name="SendRedPackType" value="2"/>随机
+                </dd>
+            </dl>
+            <dl>
+                <dt>红包名称：</dt>
+                <dd>
+                    @Html.TextBoxFor(m => m.SenderName, new { @class = "required" })
+                    <span class="info"></span>
                 </dd>
             </dl>
             <dl>
@@ -52,7 +59,7 @@
                 <dd>
                     @Html.HiddenFor(m => m.MpUserIds)
                     <input id="MpUserNicks" class="required textInput readonly" name="MpUserNicks" type="text" readonly="">
-                    <a class="btnLook" target="dialog" mask="true" rel="SelectMpUser" href="javascript:;" onclick="$(this).attr('href', '@Url.Action("SelectMpUser", "MpUser")?SelectedIds=' + $('#MpUserIds').val())">选择用户</a>
+                    <a class="btnLook" target="dialog" mask="true" rel="SelectMpUser" href="javascript:;" onclick="$(this).attr('href', '@Url.Action("SelectMpUser", "MpUser")?SelectedIds=' + $('#MpUserIds').val())" width="800" height="450">选择用户</a>
                 </dd>
             </dl>
             <dl>

@@ -25,3 +25,6 @@ function JsonDateStampFormat(stamptime) {//json日期格式转换为正常格式
         return "";
     }
 };
+function MoneyFenToYuan(value) {
+    return value / 100.00;
+}

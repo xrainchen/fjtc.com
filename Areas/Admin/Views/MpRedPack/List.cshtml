@@ -12,7 +12,7 @@
                 <table class="searchContent">
                     <tr>
                         <td>
-                            昵称：@Html.TextBoxFor(m => m.Name)
+                            用户：@Html.TextBoxFor(m => m.MpUserNick)
                         </td>
                         <td>
                             发送时间：
@@ -47,9 +47,9 @@
                 colModel: [
                     { label: 'Id', name: 'Id', width: '50px', align: 'center', sortable: false },
                     { label: '用户', name: 'MpUserNick', width: '240px' },
-                    { label: '红包金额', name: 'RedPackAmount', align: 'center', width: '250px' },
-                    { label: '发送时间', name: 'CreatedTime', align: 'center', formatter: JsonDateStampFormat },
-                    { label: '备注', name: 'Remark', align: 'center' }
+                    { label: '红包金额(元)', name: 'RedPackAmount', align: 'center', width: '150px', formatter: MoneyFenToYuan },
+                    { label: '发送时间', name: 'CreatedTime', align: 'center', formatter: JsonDateFormat },
+                    { label: '说明', name: 'Remark', align: 'center', width: '350px' }
                 ],
                 rowNum: 10,
                 rowList: [10, 50, 100],

@@ -21,6 +21,9 @@
                 <label>公司名称：</label>
                 @Html.TextBoxFor(m => m.Company)
             </p>
+            <p>
+                <a style="color: blue;" href="@Url.Action("UpdateSendRedPackPassword", "ProductUserAdmin")" target="dialog" rel="dialog_updatepassword">设置发送红包密码</a>
+            </p>
         </div>
         <div class="formBar">
             <ul>

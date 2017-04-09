@@ -65,7 +65,14 @@
             <dl>
                 <dt>备注信息：</dt>
                 <dd>
-                    @Html.TextAreaFor(m => m.Remark, new { @class = "required" })
+                    @Html.TextAreaFor(m => m.Remark, new {@class = "required"})
+                    <span class="info"></span>
+                </dd>
+            </dl>
+            <dl>
+                <dt>发送红包口令：</dt>
+                <dd>
+                    @Html.PasswordFor(m => m.SendRedPackPassword, new { @class = "required" })
                     <span class="info"></span>
                 </dd>
             </dl>
